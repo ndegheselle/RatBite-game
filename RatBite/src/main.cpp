@@ -1,10 +1,13 @@
 #include <SFML/Graphics.hpp>
 #include <Windows.h>
 #include <Dwmapi.h>
+#include <chrono>
 
 #pragma comment (lib, "Dwmapi.lib")
 
-int main()
+using Clock = std::chrono::high_resolution_clock;
+
+sf::RenderWindow& getWindow()
 {
 	sf::RenderWindow window(sf::VideoMode({ 1920u, 1080u }), "Transparent Window");
 	window.setFramerateLimit(60);
@@ -15,28 +18,43 @@ int main()
 	// Transparent window
 	SetWindowLong(window.getNativeHandle(), GWL_STYLE, WS_POPUP | WS_VISIBLE);
 	DwmExtendFrameIntoClientArea(window.getNativeHandle(), &margins);
+	return window;
+}
 
-	//CircleShape for DemoContent
-	sf::CircleShape shape(360.f);
-	shape.setFillColor(sf::Color::Green);
+int main()
+{
+	sf::RenderWindow& window = getWindow();
+	const double MS_PER_UPDATE = 1.0 / 60.0;
+
+	World world;
+	Clock::time_point previous = Clock::now();
+	double lag = 0.0;
 
 	while (window.isOpen())
 	{
+		Clock::time_point current = Clock::now();
+		std::chrono::duration<double> elapsed = current - previous;
+        previous = current;
+		lag += elapsed.count();
+
 		while (const std::optional event = window.pollEvent())
 		{
 			if (event->is<sf::Event::Closed>())
 			{
 				window.close();
 			}
-			else if (const auto* keyPressed = event->getIf<sf::Event::KeyPressed>())
-			{
-				if (keyPressed->scancode == sf::Keyboard::Scancode::Escape)
-					window.close();
-			}
+			world.inputs.update(event);
 		}
 
+        while (lag >= MS_PER_UPDATE)
+        {
+            context.world.update(context);
+            lag -= MS_PER_UPDATE;
+        }
+        
+		double alpha = lag / MS_PER_UPDATE;
 		window.clear(sf::Color::Transparent);
-		window.draw(shape);
+		context.world.render(window, alpha);
 		window.display();
 	}
 

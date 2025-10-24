@@ -1,8 +1,6 @@
 #pragma once
-
-class Context {
-	Inputs inputs;
-};
+#include <vector>
+#include <SFML/Graphics.hpp>
 
 class Inputs {
 public:
@@ -13,5 +11,20 @@ public:
 };
 
 class World {
+public:
+	Inputs inputs;
 
+	std::vector<Entity> UI;
+	std::vector<Entity> entities;
+	std::vector<Entity> backgrounds;
+
+	void update(const std::optional event);
 };
+
+class Entity
+{
+public:
+	virtual void update(const World& world) = 0;
+	virtual void render(const sf::RenderTarget& target, double alpha) const = 0;
+};
+
