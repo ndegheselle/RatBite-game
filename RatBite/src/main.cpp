@@ -2,12 +2,13 @@
 #include <Windows.h>
 #include <Dwmapi.h>
 #include <chrono>
+#include "world.h"
 
 #pragma comment (lib, "Dwmapi.lib")
 
 using Clock = std::chrono::high_resolution_clock;
 
-sf::RenderWindow& getWindow()
+sf::RenderWindow getWindow()
 {
 	sf::RenderWindow window(sf::VideoMode({ 1920u, 1080u }), "Transparent Window");
 	window.setFramerateLimit(60);
@@ -23,7 +24,7 @@ sf::RenderWindow& getWindow()
 
 int main()
 {
-	sf::RenderWindow& window = getWindow();
+	sf::RenderWindow window = getWindow();
 	const double MS_PER_UPDATE = 1.0 / 60.0;
 
 	World world;
@@ -37,7 +38,7 @@ int main()
         previous = current;
 		lag += elapsed.count();
 
-		while (const std::optional event = window.pollEvent())
+		while (const std::optional<sf::Event> event = window.pollEvent())
 		{
 			if (event->is<sf::Event::Closed>())
 			{
@@ -48,13 +49,13 @@ int main()
 
         while (lag >= MS_PER_UPDATE)
         {
-            context.world.update(context);
+            world.update();
             lag -= MS_PER_UPDATE;
         }
         
 		double alpha = lag / MS_PER_UPDATE;
 		window.clear(sf::Color::Transparent);
-		context.world.render(window, alpha);
+		world.render(window, alpha);
 		window.display();
 	}
 
