@@ -44,8 +44,8 @@ int main()
 			{
 				window.close();
 			}
-			world.inputs.update(event);
 		}
+		world.inputs.update(window);
 
         while (lag >= MS_PER_UPDATE)
         {

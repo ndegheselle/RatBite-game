@@ -4,16 +4,15 @@
 
 class Inputs {
 public:
-	bool key_up;
-	bool key_down;
-	bool key_left;
-	bool key_right;
+	bool up;
+	bool down;
+	bool left;
+	bool right;
 
 	void update(const std::optional<sf::Event>& event);
 };
 
 class World;
-
 class Entity
 {
 public:
